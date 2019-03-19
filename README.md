@@ -2,9 +2,9 @@
 SMAI semster course project
 
 ## Team Members
-- Akshat Maheshwari (20161024)
 - Kalpit Pokra (20161134)
 - Kushagra Nagori (20161032)
+- Akshat Maheshwari (20161024)
 - Kartik Garg (20161219)
 
 ## Goal
