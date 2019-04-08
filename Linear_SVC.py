@@ -1,51 +1,32 @@
+import os
+import numpy as np
 from sklearn.svm import LinearSVC
 from DataReader import DataReader
-import numpy as np
-import file_paths
 
-def populate_features(tweet_file, labels_file):
-    data_reader = DataReader(tweet_file, labels_file)
-    return data_reader.get_features()
+data_reader = DataReader("./data/us_trial.text", "./data/us_trial.labels")
+X, Y = data_reader.get_features()
 
+len_X = len(X)
+len_X = (int)(len_X / 10) 
+len_train = (int)(0.8*len_X)
+print(len_train)
+trainX, trainY = X[0:len_train], Y[0:len_train]
+trainX, trainY = np.asarray(trainX), np.asarray(trainY)
 
-def split_train(X, Y, split_point):
-    trainX = X[0:split_point]
-    trainX = np.asarray(trainX)
-
-    trainY = Y[0:split_point]
-    trainY = np.asarray(trainY)
-
-    return trainX, trainY
+testX, testY = X[len_train:len_X], Y[len_train:len_X]
+testX, testY = np.asarray(testX), np.asarray(testY)
+print(len(testX))
 
 
-def split_test(X, Y, begin, end):
-    testX = X[begin:end]
-    testX = np.asarray(testX)
+if __name__ == '__main__':
+    clf = LinearSVC(random_state=0, tol=0.001)
+    clf.fit(trainX, trainY)
 
-    testY = Y[begin:end]
-    testY = np.asarray(testY)
-
-    return testX, testY
-
-
-def evaluate_accuracy(clf, testX, testY, testing_trange):
-    counter = 0
-    total = 0
-    for i in range(testing_trange):
+    counter, len_testX = 0, len(testX)
+    for i in range(len_testX):
         output = clf.predict(np.asarray([testX[i]]))
         if output == testY[i]:
             counter += 1
-        total += 1
-    return counter / total
-
-
-def run_lsvc(tweet_file, labels_file):
-    X, Y = populate_features(tweet_file, labels_file)
-    trainX, trainY = split_train(X, Y, 800)
-    clf = LinearSVC(random_state=0, tol=0.001)
-    clf.fit(trainX, trainY)
-    testX, testY = split_test(X, Y, 800, 1000)
-    return evaluate_accuracy(clf, testX, testY, 200)
-
-accuracy = run_lsvc(file_paths.us_tweets_path, file_paths.us_labels_path)
-print(accuracy)
+    accuracy = counter / len_testX
+    accuracy = accuracy * 100
+    print("Accuracy: ", accuracy)
