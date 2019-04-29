@@ -1,22 +1,20 @@
-import csv
-import numpy as np
-import emoji
-import pandas as pd
-import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
+import numpy as np
+import csv
+import pandas as pd
+import emoji
 
 def read_glove_vecs(glove_file):
-    words = set()
-    word_to_vec_map = {}
+    words, word_to_vec_map = set(), word_to_vec_map = {}
     with open(glove_file, 'r') as f:
         for line in f:
-            line = line.strip().split()
-            curr_word = line[0]
-            words.add(curr_word)
-            word_to_vec_map[curr_word] = np.array(line[1:], dtype=np.float64)
+            line = line.strip()
+            line = line.split()
+            words.add(line[0])
+            word_to_vec_map[line[0]] = np.array(line[1:], dtype=np.float64)
         
-        i = 1
-        words_to_index = {}
+        i, words_to_index = 1, {}
         for w in sorted(words):
             words_to_index[w] = i
             i = i + 1
@@ -37,10 +35,7 @@ def read_csv(filename):
             tweet.append(row[0])
             emoji.append(row[1])
 
-    X = np.asarray(tweet)
-    Y = np.asarray(emoji, dtype=int)
-
-    return X, Y
+    return np.asarray(tweet), np.asarray(emoji, dtype=int)
 
 def convert_to_one_hot(Y, C):
     Y = np.eye(C)[Y.reshape(-1)]
@@ -89,14 +84,12 @@ def plot_confusion_matrix(y_actu, y_pred, title='Confusion matrix', cmap=plt.cm.
     df_conf_norm = df_confusion / df_confusion.sum(axis=1)
     
     plt.matshow(df_confusion, cmap=cmap) # imshow
-    #plt.title(title)
-    plt.colorbar()
     tick_marks = np.arange(len(df_confusion.columns))
-    plt.xticks(tick_marks, df_confusion.columns, rotation=45)
+    plt.colorbar()
     plt.yticks(tick_marks, df_confusion.index)
-    #plt.tight_layout()
-    plt.ylabel(df_confusion.index.name)
+    plt.xticks(tick_marks, df_confusion.columns, rotation=45)
     plt.xlabel(df_confusion.columns.name)
+    plt.ylabel(df_confusion.index.name)
     
     
 def predict(X, Y, W, b, word_to_vec_map):
@@ -114,8 +107,7 @@ def predict(X, Y, W, b, word_to_vec_map):
         avg = avg/len(words)
 
         Z = W.dot(avg) + b
-        A = softmax(Z)
-        pred[j] = np.argmax(A)
+        pred[j] = np.argmax(softmax(Z))
         
     print("Accuracy: "  + str(np.mean((pred[:] == Y.reshape(Y.shape[0],1)[:]))))
     
