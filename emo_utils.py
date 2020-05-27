@@ -6,7 +6,7 @@ import pandas as pd
 import emoji
 
 def read_glove_vecs(glove_file):
-    words, word_to_vec_map = set(), word_to_vec_map = {}
+    words, word_to_vec_map = set(), {}
     with open(glove_file, 'r') as f:
         for line in f:
             line = line.strip()
